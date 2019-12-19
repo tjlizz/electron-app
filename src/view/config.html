@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>设置页面</title>
+    <style>
+
+        * {
+            font-size: 14px;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F5F5F5;
+        }
+
+        .container .row {
+            padding: 20px;
+            margin: 20px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .container .row .title {
+            margin-right: 40px;
+            width: 100px;
+            text-align: right;
+        }
+
+        .container .row .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container .row .content .control {
+
+            margin-right: 10px;
+        }
+
+        .container .row .size-warpper {
+
+            border: 1px solid #DBDBDB;
+            background: #ffffff;
+        }
+
+        .container .row .size-warpper span {
+            padding: 2px 10px;
+        }
+
+        .container .row .size-warpper span:first-child:hover,
+        .container .row .size-warpper span:nth-child(3):hover {
+
+            background: #E5E5E5;
+            cursor: pointer;
+        }
+
+        .container .row .content .btn:hover {
+            border-color: #D1E7FC;
+        }
+
+        .container .row .content .btn {
+
+            background: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            padding: 4px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <span class="title">通用</span>
+        <div class="content">
+            <input class="control" type="checkbox" id="autoStart" aria-label="开机启动" value="1"
+                   onchange="saveModel('autoStart')"><label
+                for="autoStart">开机启动</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <span class="title">缩放</span>
+        <div class="content size-warpper"><span onclick="zoomChange('zoomIn')">-</span><span
+                id="zoomSize">100%</span><span onclick="zoomChange('zoomOut')">+</span></div>
+    </div>
+    <div class="row">
+        <span class="title">字体大小</span>
+        <div class="content">
+            <span class="control"><input type="radio" name="size" id="1" value="1" onchange="saveModel('size')">  <label
+                    for="1">标准</label></span>
+            <span class="control"><input type="radio" name="size" id="2" value="2" onchange="saveModel('size')">  <label
+                    for="2">中</label></span>
+            <span class="control"><input type="radio" name="size" id="3" value="3" onchange="saveModel('size')">  <label
+                    for="3">大</label></span>
+        </div>
+    </div>
+    <div class="row">
+        <span class="title">其他</span>
+
+        <div class="content"><span class="btn" onclick="saveModel('clear')">清除缓存</span><span class="btn"
+                                                                                             onclick="saveModel('dev')">开发者模式</span>
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script>
+    let axiox = require('axios')
+    const {ipcRenderer} = require('electron')
+
+    function zoomChange(type) {
+        let text = document.getElementById('zoomSize').textContent;
+
+        let intSize = parseInt(text.substr(0, text.length - 1))
+
+        if (type === 'zoomIn')
+            intSize = intSize - 10
+        else
+            intSize = intSize + 10
+
+        // if (intSize < 50 || intSize > 150) return
+
+        document.getElementById('zoomSize').textContent = intSize + "%"
+        saveModel(type)
+
+
+    }
+
+    function getModel(type) {
+        let mod = {
+            type: type,
+            autoStart: document.getElementById('autoStart').checked,
+            size: getRadioValue(),
+            zoom: document.getElementById('zoomSize').textContent,
+
+        }
+
+        return JSON.stringify(mod)
+    }
+
+
+    function openFile(type) {
+        document.getElementById('fileOpen').click()
+    }
+
+
+    function getRadioValue() {
+        // method 1
+        let radio = document.getElementsByName("size");
+        for (let i = 0; i < radio.length; i++) {
+            if (radio[i].checked) {
+                return radio[i].value;
+            }
+        }
+    }
+
+    function dev(type) {
+
+    }
+
+    function saveModel(type) {
+        ipcRenderer.send('send-message-A', getModel(type))
+        axiox.post('http://localhost:8888/save', getModel(type)).then(data => {
+
+
+        })
+    }
+
+    function init() {
+        axiox.get('http://localhost:8888/read').then(data => {
+            console.log(JSON.parse(data.data))
+
+            let mod = JSON.parse(data.data)
+            if (mod.autoStart)
+                document.getElementById('autoStart').setAttribute("checked", "checked")
+            document.getElementById('zoomSize').textContent = mod.zoom
+            document.getElementById(mod.size).setAttribute("checked", "checked")
+
+        })
+    }
+
+    init()
+
+</script>
+</html>
