@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>设置页面</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
     <style>
-
         * {
             font-size: 14px;
             padding: 0;
@@ -38,12 +37,10 @@
         }
 
         .container .row .content .control {
-
             margin-right: 10px;
         }
 
         .container .row .size-warpper {
-
             border: 1px solid #DBDBDB;
             background: #ffffff;
         }
@@ -54,7 +51,6 @@
 
         .container .row .size-warpper span:first-child:hover,
         .container .row .size-warpper span:nth-child(3):hover {
-
             background: #E5E5E5;
             cursor: pointer;
         }
@@ -64,7 +60,6 @@
         }
 
         .container .row .content .btn {
-
             background: #ffffff;
             border-radius: 4px;
             cursor: pointer;
@@ -75,6 +70,9 @@
     </style>
 </head>
 <body>
+
+
+
 <div class="container">
     <div class="row">
         <span class="title">通用</span>
@@ -109,8 +107,15 @@
         </div>
     </div>
 
+    <div class="row">
+        <span class="title">版本新</span>
 
-</div>
+        <div class="content"><span class="btn" onclick="saveModel('clear')">检查更新</span>
+
+
+
+        </div>
+    </div>
 </body>
 <script>
     let axiox = require('axios')
@@ -130,8 +135,6 @@
 
         document.getElementById('zoomSize').textContent = intSize + "%"
         saveModel(type)
-
-
     }
 
     function getModel(type) {
@@ -140,17 +143,13 @@
             autoStart: document.getElementById('autoStart').checked,
             size: getRadioValue(),
             zoom: document.getElementById('zoomSize').textContent,
-
         }
-
         return JSON.stringify(mod)
     }
-
 
     function openFile(type) {
         document.getElementById('fileOpen').click()
     }
-
 
     function getRadioValue() {
         // method 1
@@ -163,14 +162,11 @@
     }
 
     function dev(type) {
-
     }
 
     function saveModel(type) {
         ipcRenderer.send('send-message-A', getModel(type))
         axiox.post('http://localhost:8888/save', getModel(type)).then(data => {
-
-
         })
     }
 
@@ -189,5 +185,42 @@
 
     init()
 
+</script>
+<script src="../../layui/layui.js"></script>
+<script>
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+        //触发事件
+        var active = {
+            setPercent: function(){
+                //设置50%进度
+                element.progress('demo', '50%')
+            }
+            ,loading: function(othis){
+                var DISABLED = 'layui-btn-disabled';
+                if(othis.hasClass(DISABLED)) return;
+
+                //模拟loading
+                var n = 0, timer = setInterval(function(){
+                    n = n + Math.random()*10|0;
+                    if(n>100){
+                        n = 100;
+                        clearInterval(timer);
+                        othis.removeClass(DISABLED);
+                    }
+                    element.progress('demo', n+'%');
+                }, 300+Math.random()*1000);
+
+                othis.addClass(DISABLED);
+            }
+        };
+
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = $(this).data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+    });
 </script>
 </html>
