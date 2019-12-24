@@ -1,12 +1,12 @@
 {
   "name": "electron-demo",
-  "version": "1.2.3",
+  "version": "1.0.6",
   "description": "",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder "
   },
   "keywords": [],
   "author": "",
@@ -22,11 +22,17 @@
     "electron-updater": "^4.2.0",
     "rage-edit": "^1.2.0"
   },
-
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "http://lizeze.com:8081/"
+    }
+  ],
   "build": {
-
     "nsis": {
+      "artifactName": "${productName}-${version}.${ext}",
       "oneClick": false,
+      "perMachine": false,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,

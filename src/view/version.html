@@ -4,15 +4,22 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="../../layui/css/layui.css">
+
+    <style>
+        .wrapper {
+
+            padding: 35px;
+        }
+
+    </style>
 </head>
 <body>
-<div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">
-    <div class="layui-progress-bar  " lay-percent="0%"></div>
-</div>
+<div class="wrapper">
+    <div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">
+        <div class="layui-progress-bar  " lay-percent="0%"></div>
+    </div>
 
-<div class="site-demo-button" style="margin-top: 20px; margin-bottom: 0;">
-    <button class="layui-btn site-demo-active11" onclick="update()" data-type="setPercent">设置50%</button>
-    <button class="layui-btn site-demo-active" data-type="loading">模拟loading</button>
+
 </div>
 
 
@@ -26,19 +33,31 @@
         ipcRenderer.send('update', '2222')
     }
 
+
     let element;
-    layui.use('element', function () {
-         element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
-
-
+    let layer;
+    layui.use(['element'], function () {
+        element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        layer = layui.layer
 
     });
 
 
     ipcRenderer.on('downloadProgress', (event, data) => {
-        element.progress('demo', `${data}%`);
+
+        if (data === 'no') {
+
+
+        } else {
+            if (data.percent)
+                element.progress('demo', `${data.percent.toFixed(2)}%`);
+
+        }
+
 
     });
+    update();
+
 </script>
 
 <script>
