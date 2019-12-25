@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>版本更新</title>
     <link rel="stylesheet" href="../../layui/css/layui.css">
 
     <style>
@@ -30,6 +30,9 @@
     const {ipcRenderer} = require('electron')
 
     function update() {
+
+
+        
         ipcRenderer.send('update', '2222')
     }
 

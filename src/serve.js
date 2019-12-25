@@ -4,12 +4,9 @@ let url = require('url')
 let configTool = require('./tool/config')
 let querystring = require('querystring');
 let util = require('util');
-
 module.exports = {
     createServer: function () {
         let appServer = http.createServer(async function (request, response) {
-
-
             let parsedUrl = url.parse(request.url, true)
             let pathWithQuery = request.url
             let queryString = ''
@@ -26,14 +23,12 @@ module.exports = {
                 response.write('哈哈哈')
                 response.end()
             } else if (path === "/read") {
-
                 configTool.readConfig(data => {
                     response.statusCode = 200
                     response.setHeader('Content-Type', 'text/json;charset=utf-8')
                     response.write(data)
                     response.end()
                 })
-
 
             } else if (method === 'POST' && path === '/save') {
                 let postData = '';

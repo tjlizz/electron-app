@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>设置页面</title>
@@ -69,57 +70,59 @@
         }
     </style>
 </head>
+
 <body>
 
 
 
-<div class="container">
-    <div class="row">
-        <span class="title">通用</span>
-        <div class="content">
-            <input class="control" type="checkbox" id="autoStart" aria-label="开机启动" value="1"
-                   onchange="saveModel('autoStart')"><label
-                for="autoStart">开机启动</label>
+    <div class="container">
+        <div class="row">
+            <span class="title">通用</span>
+            <div class="content">
+                <input class="control" type="checkbox" id="autoStart" aria-label="开机启动" value="1"
+                    onchange="saveModel('autoStart')"><label for="autoStart">开机启动</label>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <span class="title">缩放</span>
-        <div class="content size-warpper"><span onclick="zoomChange('zoomIn')">-</span><span
-                id="zoomSize">100%</span><span onclick="zoomChange('zoomOut')">+</span></div>
-    </div>
-    <div class="row">
-        <span class="title">字体大小</span>
-        <div class="content">
-            <span class="control"><input type="radio" name="size" id="1" value="1" onchange="saveModel('size')">  <label
-                    for="1">标准</label></span>
-            <span class="control"><input type="radio" name="size" id="2" value="2" onchange="saveModel('size')">  <label
-                    for="2">中</label></span>
-            <span class="control"><input type="radio" name="size" id="3" value="3" onchange="saveModel('size')">  <label
-                    for="3">大</label></span>
+        <div class="row">
+            <span class="title">缩放</span>
+            <div class="content size-warpper"><span onclick="zoomChange('zoomIn')">-</span><span
+                    id="zoomSize">100%</span><span onclick="zoomChange('zoomOut')">+</span></div>
         </div>
-    </div>
-    <div class="row">
-        <span class="title">其他</span>
-
-        <div class="content"><span class="btn" onclick="saveModel('clear')">清除缓存</span><span class="btn"
-                                                                                             onclick="saveModel('dev')">开发者模式</span>
+        <div class="row">
+            <span class="title">字体大小</span>
+            <div class="content">
+                <span class="control"><input type="radio" name="size" id="1" value="1" onchange="saveModel('size')">
+                    <label for="1">标准</label></span>
+                <span class="control"><input type="radio" name="size" id="2" value="2" onchange="saveModel('size')">
+                    <label for="2">中</label></span>
+                <span class="control"><input type="radio" name="size" id="3" value="3" onchange="saveModel('size')">
+                    <label for="3">大</label></span>
+            </div>
         </div>
-    </div>
+        <div class="row">
+            <span class="title">其他</span>
 
-    <div class="row">
-        <span class="title">版本新</span>
-
-        <div class="content"><span class="btn" onclick="saveModel('clear')">检查更新</span>
-
-
-
+            <div class="content"><span class="btn" onclick="saveModel('clear')">清除缓存</span><span class="btn"
+                    onclick="saveModel('dev')">开发者模式</span>
+            </div>
         </div>
-    </div>
+
+        <div class="row">
+            <span class="title">版本新</span>
+
+            <div class="content"><span class="btn" onclick="saveModel('clear')">检查更新</span>
+
+
+
+            </div>
+        </div>
+
+        <span id="111"></span>
 </body>
 <script>
     let axiox = require('axios')
-    const {ipcRenderer} = require('electron')
+    const { ipcRenderer } = require('electron')
 
     function zoomChange(type) {
         let text = document.getElementById('zoomSize').textContent;
@@ -170,7 +173,7 @@
         })
     }
 
-    function init() {
+    function init() { 
         axiox.get('http://localhost:8888/read').then(data => {
             console.log(JSON.parse(data.data))
 
@@ -188,39 +191,40 @@
 </script>
 <script src="../../layui/layui.js"></script>
 <script>
-    layui.use('element', function(){
+    layui.use('element', function () {
         var $ = layui.jquery
-            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+            , element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
 
         //触发事件
         var active = {
-            setPercent: function(){
+            setPercent: function () {
                 //设置50%进度
                 element.progress('demo', '50%')
             }
-            ,loading: function(othis){
+            , loading: function (othis) {
                 var DISABLED = 'layui-btn-disabled';
-                if(othis.hasClass(DISABLED)) return;
+                if (othis.hasClass(DISABLED)) return;
 
                 //模拟loading
-                var n = 0, timer = setInterval(function(){
-                    n = n + Math.random()*10|0;
-                    if(n>100){
+                var n = 0, timer = setInterval(function () {
+                    n = n + Math.random() * 10 | 0;
+                    if (n > 100) {
                         n = 100;
                         clearInterval(timer);
                         othis.removeClass(DISABLED);
                     }
-                    element.progress('demo', n+'%');
-                }, 300+Math.random()*1000);
+                    element.progress('demo', n + '%');
+                }, 300 + Math.random() * 1000);
 
                 othis.addClass(DISABLED);
             }
         };
 
-        $('.site-demo-active').on('click', function(){
+        $('.site-demo-active').on('click', function () {
             var othis = $(this), type = $(this).data('type');
             active[type] ? active[type].call(this, othis) : '';
         });
     });
 </script>
+
 </html>

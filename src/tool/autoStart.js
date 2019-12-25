@@ -1,7 +1,6 @@
 const {Registry} = require('rage-edit')
 const path = require('path')
 const {app} = require('electron')
-
 module.exports = {
 	 url:'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run',
 	 name:'my_application',

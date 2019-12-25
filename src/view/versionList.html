@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>更新内容</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <style>
+        li {
+            padding: 9px;
+        }
+        .warpper {
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="warpper">
+        <ul id='content' class="layui-timeline">
+
+        </ul>
+    </div>
+
+</body>
+<script src="../../layui/layui.js"></script>
+<script>
+    const $ = require('jquery')
+
+    function aaa() {
+
+        console.log($)
+        let array = [{ version: '1.0.1', list: ['1111', '22222', '33333'] },
+        { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }, { version: '1.0.2', list: ['12313131', '3113131'] }]
+
+        array.forEach(element => {
+
+            let list = ''
+
+            element.list.forEach(item => {
+
+                list += `<p>${item}<p>`
+
+            })
+
+            let html = `<li class="layui-timeline-item" ">
+        <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+        <div class="layui-timeline-content layui-text">
+            <h3 class="layui-timeline-title">${element.version}</h3>
+             ${list}
+          
+
+           
+        </div>
+    </li>`
+
+            $('#content').append($(html))
+        });
+
+
+    }
+    $(function () {
+        aaa()
+
+    })
+    document.onread
+
+</script>
+
+</html>
