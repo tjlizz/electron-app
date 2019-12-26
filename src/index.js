@@ -1,18 +1,23 @@
-const {app, BrowserWindow, Menu, ipcMain, webContents} = require('electron')
+const { app, BrowserWindow, Menu, ipcMain, webContents, dialog } = require('electron')
 require('./tool/application-menu')
 let win = null;
 const fs = require('fs')
 let auto = require('./tool/autoStart')
 let configHelper = require('./tool/config');
 const path = require('path')
+require('./serve')
 const version = require('./tool/version')
-const {autoUpdater} = require("electron-updater");
-
+const { autoUpdater } = require("electron-updater");
+const isDev = require('electron-is-dev');
 function createWindow() {
     // 创建浏览器窗口                                                                                                                                                 
     win = new BrowserWindow({
         fullscreen: false,
         id: 'main',
+        width: 1000,
+        // icon:path.join(__dirname,'./static/confirm.png'),
+        height: 800,
+        frame: true,
         webPreferences: {
             webviewTag: true,
             nodeIntegration: true
@@ -21,9 +26,12 @@ function createWindow() {
     // 加载index.html文件
     win.loadURL('https://www.dogedoge.com/')
     // win.loadFile('index.html')
-    win.webContents.on('did-finish-load', () => {
-        //   autoUpdate.checkVersion(win)
 
+    if (isDev)
+        win.webContents.openDevTools()
+    win.webContents.on('did-finish-load', () => {
+        // if (!isDev)
+        autoUpdater.checkForUpdates()
     })
 }
 
@@ -58,14 +66,33 @@ function updateHandle() {
     });
     // 更新下载进度事件
     autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {
-        autoUpdater.quitAndInstall()
-        fs.writeFile(path.join(__dirname, '../data/version.json'), JSON.stringify({fitstLogin: true}), 'utf-8', (err) => {
+
+        const options = {
+            type: 'info',
+            title: '提示',
+            message: "发现新版本，是否现在更新",
+            buttons: ['是', '取消'],
+            cancelId: 1,
+            defaultId: 1
+
+        }
+        dialog.showMessageBox(win, options, (response, checkboxChecked) => {
+            console.log(typeof response)
+            console.log(response)
+            if (response === 0)
+                autoUpdater.quitAndInstall()
+
         })
+
+
+
+
     });
     ipcMain.on('close', () => {
         BrowserWindow.getFocusedWindow().close()
     })
     ipcMain.on('update', (event, arg) => {
+
         autoUpdater.checkForUpdates()
         autoUpdater.on('download-progress', function (progressObj) {
             console.log(JSON.stringify(progressObj))
@@ -86,6 +113,12 @@ function saveConfig() {
     configHelper.saveConfig();
 
 }
+
+ipcMain.on('getVersion', (event, arg) => {
+
+    event.sender.send('version', app.getVersion())
+})
+
 
 ipcMain.on('send-message-A', (event, arg) => {
 
@@ -135,5 +168,17 @@ ipcMain.on('send-message-A', (event, arg) => {
 
 //server.createServer()
 updateHandle()
-
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+    app.quit()
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // 当运行第二个实例时,将会聚焦到mainWindow这个窗口
+        if (win) {
+            if (win.isMinimized()) mainWindow.restore()
+            win.focus()
+            win.show()
+        }
+    })
+}
 app.on('ready', createWindow)

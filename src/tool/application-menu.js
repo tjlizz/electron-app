@@ -1,22 +1,25 @@
-const { app, Menu, BrowserWindow } = require('electron')
+const { app, Menu, BrowserWindow, Tray ,nativeImage} = require('electron')
 const { autoUpdater } = require("electron-updater");
 const ipcRenderer = require('electron').ipcRenderer;
 const path = require('path')
 const version = require('./version')
 const dialog = require('electron').dialog
+const isDev = require('electron-is-dev');
+const execTool = require('./execFile')
 const template = [{
     role: 'help',
     label: '帮助',
+    type: 'submenu',
     submenu: [
         {
-            label: '设置qq',
+            label: '设置',
             click: async (item, focusedWindow) => {
                 let newWin = new BrowserWindow({
                     width: 450,
-                    title: '这是一个设置页面',
+                    title: '',
                     height: 600,
                     parent: focusedWindow,
-                    // autoHideMenuBar: true,
+                    autoHideMenuBar: true,
                     id: 'new',
                     modal: true,
                     frame: true,
@@ -24,12 +27,14 @@ const template = [{
                         nodeIntegration: true
                     }
                 })
-                newWin.webContents.openDevTools()
+                if (isDev)
+                    newWin.webContents.openDevTools()
 
                 newWin.loadFile(path.join(__dirname, '../view/config.html'))
             }
         }, {
             label: '更新',
+            visible: false,
             click: (item, focusedWindow) => {
 
                 version.check((data => {
@@ -39,7 +44,7 @@ const template = [{
                             type: 'info',
                             title: '提示',
                             message: "当前系统已经是最新版本",
-                            buttons: ['好的']
+                            buttons: ['确定']
                         }
                         dialog.showMessageBox(options)
                     } else {
@@ -57,7 +62,8 @@ const template = [{
                                 nodeIntegration: true
                             }
                         })
-                        newWin.webContents.openDevTools()
+                        if (isDev)
+                            newWin.webContents.openDevTools()
 
                         newWin.loadFile(path.join(__dirname, '../view/version.html'))
 
@@ -76,6 +82,7 @@ const template = [{
             }
         }, {
             label: '更新记录',
+            visible: false,
             click: () => {
                 let newWin = new BrowserWindow({
                     title: '版本更新',
@@ -88,13 +95,37 @@ const template = [{
                     }
                 })
                 newWin.loadFile(path.join(__dirname, '../view/versionList.html'))
-                newWin.webContents.openDevTools()
+                if (isDev)
+                    newWin.webContents.openDevTools()
+            }
+        },
+        {
+            label: '播放',
+            visible: true,
+            id: 'zoomIn',
+            click: () => {
+                const url = path.resolve(__dirname, '../../')
+                execTool.exec(path.join(url + "/resources/aaa.exe"))
+
             }
         }, {
-            label: '放大',
-            visible: false,
-            role: 'zoomIn',
-            id: 'zoomIn'
+
+            label: '测试',
+            visible: isDev,
+            click: (item, focusedWindow) => {
+
+                 
+                const options = {
+                    type: 'question',
+                    title: '提示',
+                    message: "当前系统已经是最新版本",
+                    buttons: ['确定', '取消'],
+                    cancelId :1
+                }
+                dialog.showMessageBox(focusedWindow, options, (response, checkboxChecked) => {
+                    console.log(response)
+                })
+            }
         }
     ]
 }]
@@ -103,4 +134,5 @@ const template = [{
 app.on('ready', () => {
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
+
 })

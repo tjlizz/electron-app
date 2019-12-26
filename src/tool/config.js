@@ -5,7 +5,6 @@ const path = require('path');
 module.exports = {
     saveConfig: function (mod) {
         fs.writeFile("./data/config.json", mod, 'utf8', (err) => {
-            if (err) reject(err);
         });
     },
     readConfig: function (callback) {
