@@ -169,8 +169,29 @@
 
     function saveModel(type) {
         ipcRenderer.send('send-message-A', getModel(type))
-        axiox.post('http://localhost:8888/save', getModel(type)).then(data => {
-        })
+        // axiox.post('http://localhost:8888/save', getModel(type)).then(data => {
+        // })
+        localStorage.setItem('config', getModel(type))
+
+    }
+
+
+    function getConfig() {
+
+        let config = localStorage.getItem('config');
+        if (!config) {
+
+            config = {
+                type: 'zoomOt',
+                autoStart: false,
+                size: 1,
+                zoom: '100%'
+            }
+        } else {
+            config = JSON.parse(config)
+        }
+
+        return config;
     }
 
     function init() {
@@ -181,16 +202,14 @@
 
         })
 
-        axiox.get('http://localhost:8888/read').then(data => {
-            console.log(JSON.parse(data.data))
 
-            let mod = JSON.parse(data.data)
-            if (mod.autoStart)
-                document.getElementById('autoStart').setAttribute("checked", "checked")
-            document.getElementById('zoomSize').textContent = mod.zoom
-            document.getElementById(mod.size).setAttribute("checked", "checked")
+        let mod = getConfig();
+        if (mod.autoStart)
+            document.getElementById('autoStart').setAttribute("checked", "checked")
+        document.getElementById('zoomSize').textContent = mod.zoom
+        document.getElementById(mod.size).setAttribute("checked", "checked")
 
-        })
+
     }
 
     init()

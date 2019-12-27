@@ -1,55 +1,85 @@
-let http = require('http')
 let fs = require('fs')
-let url = require('url')
+let express = require('express');
+let app = express();
+let bodyParser = require("body-parser")
 let configTool = require('./tool/config')
-let querystring = require('querystring');
-let util = require('util');
+app.use(express.json())
+const path = require('path')
+const cors = require('cors')
+var net = require('net')
+app.use(cors())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, './pipelineout')));
+ 
+ 
 
-let appServer = http.createServer(async function (request, response) {
-    let parsedUrl = url.parse(request.url, true)
-    let pathWithQuery = request.url
-    let queryString = ''
-    if (pathWithQuery.indexOf('?') >= 0) {
-        queryString = pathWithQuery.substring(pathWithQuery.indexOf('?'))
-    }
-    let path = parsedUrl.pathname
-    let query = parsedUrl.query
-    let method = request.method
-    console.log(method)
-    if (path === '/') {
-        response.statusCode = 200
-        response.setHeader('Content-Type', 'text/html;charset=utf-8')
-        response.write('哈哈哈')
-        response.end()
-    } else if (path === "/read") {
-        configTool.readConfig(data => {
-            response.statusCode = 200
-            response.setHeader('Content-Type', 'text/json;charset=utf-8')
-            response.write(data)
-            response.end()
-        })
 
-    } else if (method === 'POST' && path === '/save') {
-        let postData = '';
-        // 18. 给req对象注册一个接收数据的事件
-        request.on('data', function (chuck) {
-            postData += chuck;
-        })
-        request.on('end', function () {
-            configTool.saveConfig(postData)
-            response.statusCode = 200
-            response.setHeader('Content-Type', 'text/json;charset=utf-8')
-            response.write('true')
-            response.end()
 
-        })
+function probe(port, callback) {
 
-    } else {
-        response.statusCode = 404
-        response.setHeader('Content-Type', 'text/html;charset=utf-8')
-        response.write('呜呜呜')
-        response.end()
-    }
+    let server = net.createServer().listen(port)
 
-})
-appServer.listen(8888)
+    var calledOnce = false
+
+    var timeoutRef = setTimeout(function () {
+        calledOnce = true
+        callback(false, port)
+    }, 2000)
+
+    timeoutRef.unref()
+
+    var connected = false
+
+    server.on('listening', function () {
+        clearTimeout(timeoutRef)
+
+        if (server)
+            server.close()
+
+        if (!calledOnce) {
+            calledOnce = true
+            callback(true, port)
+        }
+    })
+
+    server.on('error', function (err) {
+        clearTimeout(timeoutRef)
+
+        var result = true
+        if (err.code === 'EADDRINUSE')
+            result = false
+
+        if (!calledOnce) {
+            calledOnce = true
+            callback(result, port)
+        }
+    })
+}
+
+function createServer(_port, callback) {
+    var pt = _port || 8888;
+    probe(pt, function (bl, _pt) {
+        // 端口被占用 bl 返回false
+        // _pt：传入的端口号
+        if (bl === true) {
+            // ssr(_pt)
+            app.listen(pt)
+            callback && callback(pt)
+
+
+        } else {
+            createServer(_pt + 1, callback)
+        }
+    })
+}
+
+
+
+
+module.exports = {
+
+
+    createServer: (port, callback) => createServer(port, callback)
+}
+

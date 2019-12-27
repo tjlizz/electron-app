@@ -1,12 +1,19 @@
 const { app, BrowserWindow, Menu, ipcMain, webContents, dialog } = require('electron')
+
+
+let port = require('./serve')
+
+
 require('./tool/application-menu')
 let win = null;
 const fs = require('fs')
+const execTool = require('./tool/execFile')
+
 let auto = require('./tool/autoStart')
 let configHelper = require('./tool/config');
 const path = require('path')
-require('./serve')
 const version = require('./tool/version')
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
 const { autoUpdater } = require("electron-updater");
 const isDev = require('electron-is-dev');
 function createWindow() {
@@ -24,14 +31,18 @@ function createWindow() {
         }
     })
     // 加载index.html文件
-    win.loadURL('https://www.dogedoge.com/')
-    // win.loadFile('index.html')
+    //https://www.dogedoge.com/
+    //  win.loadURL('https://www.dogedoge.com/')
+    win.loadURL('http://localhost:8082/')
+    //  win.loadFile(path.join(__dirname,'./view/index.html'))
 
     if (isDev)
         win.webContents.openDevTools()
     win.webContents.on('did-finish-load', () => {
-        // if (!isDev)
-        autoUpdater.checkForUpdates()
+        if (!isDev)
+            autoUpdater.checkForUpdates()
+
+
     })
 }
 
@@ -91,6 +102,12 @@ function updateHandle() {
     ipcMain.on('close', () => {
         BrowserWindow.getFocusedWindow().close()
     })
+    ipcMain.on('openVideo', () => {
+        console.log(222)
+        const url = path.resolve(__dirname, '../resources/aaa.exe')
+        execTool.exec(path.join(url))
+    })
+
     ipcMain.on('update', (event, arg) => {
 
         autoUpdater.checkForUpdates()
@@ -117,6 +134,17 @@ function saveConfig() {
 ipcMain.on('getVersion', (event, arg) => {
 
     event.sender.send('version', app.getVersion())
+})
+
+ipcMain.on('createServer', (event, arg) => {
+
+
+    port.createServer(8888, (port) => {
+
+        event.sender.send('serverPort', port)
+
+    })
+
 })
 
 

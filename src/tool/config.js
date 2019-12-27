@@ -14,13 +14,16 @@ module.exports = {
             fs.readFile(`${folder}config.json`, 'utf8', function (err, data) {
                 if (err) {
                     fs.mkdir(folder, function (err) {
-                        if (err) {
-                            return console.error(err);
+
+                        let content = {
+                            type: 'zoomOt',
+                            autoStart: false,
+                            size: 1,
+                            zoom: '100%'
                         }
-                        let content = '{"type":"zoomOut","autoStart":true,"size":"1","zoom":"100%"}';
-                        fs.writeFile(`${folder}config.json`, content, 'utf8', (err) => {
-                            if (err) throw  err
-                            callback && callback(content)
+                        fs.writeFile(`${folder}config.json`, JSON.stringify(content), 'utf8', (err) => {
+                            if (err) throw err
+                            callback && callback(JSON.stringify(content))
 
                         });
                     });

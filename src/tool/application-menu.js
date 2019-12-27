@@ -1,7 +1,8 @@
-const { app, Menu, BrowserWindow, Tray ,nativeImage} = require('electron')
+const { app, Menu, BrowserWindow, Tray, nativeImage } = require('electron')
 const { autoUpdater } = require("electron-updater");
 const ipcRenderer = require('electron').ipcRenderer;
 const path = require('path')
+
 const version = require('./version')
 const dialog = require('electron').dialog
 const isDev = require('electron-is-dev');
@@ -11,8 +12,12 @@ const template = [{
     label: '帮助',
     type: 'submenu',
     submenu: [
+        { label: '刷新', role: 'reload' }, {
+            type: 'separator'
+        },
         {
             label: '设置',
+            accelerator: 'Ctrl+Z',
             click: async (item, focusedWindow) => {
                 let newWin = new BrowserWindow({
                     width: 450,
@@ -32,7 +37,10 @@ const template = [{
 
                 newWin.loadFile(path.join(__dirname, '../view/config.html'))
             }
-        }, {
+        },
+
+        
+        {
             label: '更新',
             visible: false,
             click: (item, focusedWindow) => {
@@ -80,7 +88,10 @@ const template = [{
                 // autoUpdater.checkForUpdates('')
 
             }
-        }, {
+        },
+
+       
+        {
             label: '更新记录',
             visible: false,
             click: () => {
@@ -98,29 +109,29 @@ const template = [{
                 if (isDev)
                     newWin.webContents.openDevTools()
             }
-        },
+        } ,
         {
             label: '播放',
-            visible: true,
+            visible: false,
             id: 'zoomIn',
             click: () => {
                 const url = path.resolve(__dirname, '../../')
                 execTool.exec(path.join(url + "/resources/aaa.exe"))
 
             }
-        }, {
+        } , {
 
             label: '测试',
-            visible: isDev,
+            visible: false,
             click: (item, focusedWindow) => {
 
-                 
+
                 const options = {
                     type: 'question',
                     title: '提示',
                     message: "当前系统已经是最新版本",
                     buttons: ['确定', '取消'],
-                    cancelId :1
+                    cancelId: 1
                 }
                 dialog.showMessageBox(focusedWindow, options, (response, checkboxChecked) => {
                     console.log(response)
@@ -133,6 +144,7 @@ const template = [{
 
 app.on('ready', () => {
     const menu = Menu.buildFromTemplate(template)
-    Menu.setApplicationMenu(menu)
+   Menu.setApplicationMenu(menu)
+     
 
 })
